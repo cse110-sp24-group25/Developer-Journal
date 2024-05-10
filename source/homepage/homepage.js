@@ -4,6 +4,12 @@ function init() {
     getDate('current-date')
 }
 
+/**
+ * Displays the current date in a specified HTML container.
+ * The date is formatted in a long format with the day of the week, the month name, the day of the month, and the year.
+ * 
+ * @param {string} container_id - The ID of the HTML container where the date will be displayed.
+ */
 function getDate(container_id) {
     // Get the current date
     const currentDate = new Date();
