@@ -10,3 +10,4 @@ jobs:
         with:
           source_dir: ./source/homepage
           recurse: true
+          output_dir: ./out
