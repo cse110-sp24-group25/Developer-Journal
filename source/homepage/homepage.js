@@ -12,11 +12,11 @@ function init() {
     currYear = date.getFullYear();
     currDay = date.getDate();
 
+    // Date header function
+    displayDate(currDay, currMonth, currYear);
     // getDate('current-date');
 
     // CALENDAR STUFF
-    // Initialize list of days of the week
-    // let allDays = ["Sun", "Mon", "Tue", "Wed","Thu", "Fri", "Sat"];
     
     /*
     // PREVIOUS BUTTON
@@ -42,17 +42,17 @@ function init() {
  * 
  * @param {string} container_id - ID of the HTML container where the date will be displayed
  */
-function getDate(container_id) {
-    // Get the current date
-    const currentDate = new Date();
+// function getDate(container_id) {
+//     // Get the current date
+//     const currentDate = new Date();
 
-    // Format the date (e.g., "May 8, 2024")
-    const formattedDate = currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+//     // Format the date (e.g., "May 8, 2024")
+//     const formattedDate = currentDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // Display the date in the designated container
-    const dateContainer = document.getElementById(container_id);
-    dateContainer.textContent = formattedDate;
-}
+//     // Display the date in the designated container
+//     const dateContainer = document.getElementById(container_id);
+//     dateContainer.textContent = formattedDate;
+// }
 
 /**
  * Shows that a given button has been selected by adding the active property to its classname
@@ -256,4 +256,21 @@ function daysInMonth(mnth, yr){
     var lastDay= new Date(yr, ((mnth+1)%12) , 0);
     // Return max day count
     return lastDay.getDate();
+}
+
+// Create the date header
+function displayDate(day, mnth, yr){
+    // initialize days of the week
+    let allDays = ["Sunday", "Monday", "Tuesday", "Wednesday","Thursday", "Friday", "Saturday"];
+    // Initialize list of months
+    let allMonths = [
+        "January","February","March","April","May","June",
+        "July","August","September","October","November","December"
+    ];
+
+    // Get date
+    let dayOfWeek = new Date(yr, mnth, day).getDay();
+
+    let header = document.getElementById("date-header");
+    header.textContent = allDays[dayOfWeek] + " " + allMonths[mnth] + " " + day + ", " + yr;
 }
