@@ -6,7 +6,33 @@ window.addEventListener('DOMContentLoaded', init);
  * @returns {undefined} Nothing
  */
 function init() {
+    // initialize date variables
+    date = new Date();
+    currMonth = date.getMonth();
+    currYear = date.getFullYear();
+
     getDate('current-date');
+
+    // CALENDAR STUFF
+    // Initialize list of days of the week
+    let allDays = ["Sun", "Mon", "Tue", "Wed","Thu", "Fri", "Sat"];
+    console.log("HERE");
+    
+    /*
+    // PREVIOUS BUTTON
+    let prevBtn = document.getElementById("previous");
+    prevBtn.addEventListener('click', () => { 
+        prev();
+    });
+    // NEXT BUTTON
+    let nextBtn = document.getElementById("next");
+    nextBtn.addEventListener('click', () => { 
+        next();
+    });
+    */
+
+    // Initially call displayCalendar to display the calendar
+    displayCalendar(currMonth, currYear);
 }
 
 /**
@@ -118,4 +144,136 @@ function addTask() {
     // Append the new list item to the task list
     const taskContainer = document.getElementById('taskContainer');
     taskContainer.appendChild(li);
+}
+
+// Function to display the calendar
+function displayCalendar(mnth, yr){
+    console.log("BUILDING CALENDAR");
+    // Get calendar day of first day in given month
+    let first = new Date(yr, mnth, 1);
+
+    // Get weekday 0-6
+    let firstDay = first.getDay();
+
+    // Get and clear the table
+    let table = document.getElementById("table-week");
+    table.innerHTML = "";
+
+    // Set previous month and year variables
+    let prevMonth = mnth - 1;
+    let prevYear = yr;
+    if (mnth == 0){
+        prevMonth = 11;
+        prevYear = yr-1;
+    }
+
+    // Intitialize current day and cell day
+    let currMonthDay = 1;
+    let cellNum
+
+    // BUILD CALENDAR
+    // Create row
+    let row = document.createElement("tr");
+
+    // Loop through number of columns
+    for (let j = 0; j < 7; j++) {
+        // Create data for each table cell in the row
+        let cell_data = document.createElement("td");
+
+        // Fill in previous month into unfilled cells before first day of month
+        if (i == 0 && j < firstDay) {
+            // Calculate dates of previous month
+            let prevMonthDay = daysInMonth(prevMonth, prevYear) - (firstDay - j) + 1;
+            // Number of current day
+            cellNum = document.createElement('span');
+            cellNum.textContent = prevMonthDay;
+            cellNum.className = "cell-date";
+
+            // Add class date-num and other-month
+            cell_data.className = "other-month-date-num";
+
+        } 
+        // Fill in days of current month
+        else {
+            // Number of current day
+            cellNum = document.createElement('span');
+            cellNum.textContent = currMonthDay;
+            cellNum.className = "cell-date";
+            // Add class date-num
+            cell_data.className = "curr-month-date-num";
+
+            // Current cell date
+            let cellDate = new Date(yr, mnth, currMonthDay);
+            // If cell is in the future
+            if (cellDate > date) {
+                cell_data.classList.add("future-date");
+            }
+            // If cell is today
+            else if (cellDate.toDateString() === date.toDateString()) {
+                cell_data.classList.add("current-date");
+            }
+
+            // Increment curr month day counter
+            currMonthDay++;
+        }
+        
+        // Append cell number to new cell
+        cell_data.appendChild(cellNum);
+
+        // Add sentiment icon
+        let sentimentIcon = document.createElement("img");
+        sentimentIcon.src = "../icons/5overjoyed.png"; 
+        sentimentIcon.alt = "sentiment icon";
+        sentimentIcon.className = "sentiment-icon";
+        // Append sentiment icon to new cell
+        cell_data.appendChild(sentimentIcon);
+
+        // Add productivity icon
+        let productivityIcon = document.createElement("img");
+        productivityIcon.src = "../icons/5overjoyed.png"; 
+        productivityIcon.alt = "productivity icon";
+        productivityIcon.className = "productivity-icon";
+        // Append sentiment icon to new cell
+        cell_data.appendChild(productivityIcon);
+
+        // Add tasklist in calendar cell
+        // Create tasklist div
+        let taskDiv = document.createElement("div");
+        taskDiv.className = "task-div";
+        // Create unordered list
+        let taskList = document.createElement("ul");
+        taskList.className = "task-ul";
+        // first task
+        let task1 = document.createElement("li");
+        task1.textContent = "I am the first task";
+        task1.className = "task-item";
+        taskList.appendChild(task1);
+        // second task
+        let task2 = document.createElement("li");
+        task2.textContent = "I am the second task";
+        task2.className = "task-item";
+        taskList.appendChild(task2);
+        // third task
+        let task3 = document.createElement("li");
+        task3.textContent = "I am the third task";
+        task3.className = "task-item";
+        taskList.appendChild(task3);
+        // Append taskList to task div;
+        taskDiv.appendChild(taskList);
+        // Append tasklist div to new cell
+        cell_data.appendChild(taskDiv);
+
+        // Append new cell to row
+        row.appendChild(cell_data);
+    }
+    // Append row to table
+    table.appendChild(row);
+}
+
+// Get number of days in a given month
+function daysInMonth(mnth, yr){
+    // Get last date of current month
+    var lastDay= new Date(yr, ((mnth+1)%12) , 0);
+    // Return max day count
+    return lastDay.getDate();
 }

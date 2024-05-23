@@ -261,12 +261,12 @@ button:hover {
 /* End of top bar */
 
 /* Start of past week */
-.past-week-wrap {
+/* .past-week-wrap {
   height: 28%;
-  /* border: blue solid 2px; */
-}
+  border: blue solid 2px;
+} */
 
-.past-week-grid {
+/* .past-week-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
   width: min(78rem, 100%);
@@ -275,7 +275,7 @@ button:hover {
   padding-bottom: max(1.5rem, 3.5vh);;
   padding-left: 1em;
   padding-right: 3em;
-}
+} */
 
 .past-day {
   border: black solid 2px;
@@ -399,4 +399,83 @@ button:hover {
   margin: 0; /* Overwrite inherited margin from task-list */
 }
 /* End of completed list */
+
+
+/* Bottom calendar week start*/
+
+/* Bottom calendar week wrap */
+.past-week-wrap {
+  background-color: pink;
+  margin-top: 1%;
+  margin-right: 5%;
+  margin-left: 2%;
+  height: 22%;
+}
+
+/* Calendar Table Styling */
+.table-week {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin: 0;
+  height: 100%;
+}
+
+/* Calendar Data Cell Styling */
+.table-week td {
+  border: 3px solid black;
+  padding: 10px;
+}
+
+/* Calendar date */
+td .cell-date {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+}
+
+/* Sentiment icon */
+td .sentiment-icon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  height: 18px;
+}
+
+/* Productivity icon */
+td .productivity-icon {
+  position: absolute;
+  right: 24px;
+  top: 5px;
+  height: 18px;
+}
+
+/* Task div in calendar cell */
+.task-div {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  top: 25px;
+  /* CAN UNCOMMENT BGCOLOR TO VISUALIZE TASK-DIV  */
+  /* background-color: pink; */
+  width: 96%;
+  height: 65%;
+}
+
+/* Unordered list in calendar cell */
+.task-ul{
+  margin: 0px;
+  padding-left: 6px;
+  color: black;
+  font-size: 12px;
+}
+
+/* Individual tasks in calendar cell */
+.task-item{
+  list-style-position: inside;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
