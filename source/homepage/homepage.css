@@ -405,7 +405,6 @@ button:hover {
 
 /* Bottom calendar week wrap */
 .past-week-wrap {
-  background-color: pink;
   margin-top: 1%;
   margin-right: 5%;
   margin-left: 2%;
@@ -423,50 +422,52 @@ button:hover {
 
 /* Calendar Data Cell Styling */
 .table-week td {
+  position: relative;
   border: 3px solid black;
-  padding: 10px;
+  padding: 0;
 }
 
 /* Calendar date */
 td .cell-date {
   position: absolute;
-  left: 5px;
-  top: 5px;
+  top: 0;
+  left: 2px;
 }
 
 /* Sentiment icon */
 td .sentiment-icon {
   position: absolute;
+  top: 2px;
   right: 5px;
-  top: 5px;
   height: 18px;
 }
 
 /* Productivity icon */
 td .productivity-icon {
   position: absolute;
+  top: 2px;
   right: 24px;
-  top: 5px;
   height: 18px;
 }
 
 /* Task div in calendar cell */
-.task-div {
+td .task-div {
   position: absolute;
-  display: flex;
-  flex-direction: column;
+  /* display: flex; */
+  /* flex-direction: column; */
+  top: 24px;
   justify-content: space-between;
-  top: 25px;
   /* CAN UNCOMMENT BGCOLOR TO VISUALIZE TASK-DIV  */
   /* background-color: pink; */
   width: 96%;
-  height: 65%;
+  height: 78%;
 }
 
 /* Unordered list in calendar cell */
 .task-ul{
   margin: 0px;
   padding-left: 6px;
+  padding-bottom: 0;
   color: black;
   font-size: 12px;
 }

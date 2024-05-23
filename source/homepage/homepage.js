@@ -10,13 +10,13 @@ function init() {
     date = new Date();
     currMonth = date.getMonth();
     currYear = date.getFullYear();
+    currDay = date.getDate();
 
-    getDate('current-date');
+    // getDate('current-date');
 
     // CALENDAR STUFF
     // Initialize list of days of the week
-    let allDays = ["Sun", "Mon", "Tue", "Wed","Thu", "Fri", "Sat"];
-    console.log("HERE");
+    // let allDays = ["Sun", "Mon", "Tue", "Wed","Thu", "Fri", "Sat"];
     
     /*
     // PREVIOUS BUTTON
@@ -32,7 +32,7 @@ function init() {
     */
 
     // Initially call displayCalendar to display the calendar
-    displayCalendar(currMonth, currYear);
+    displayCalendar(currDay, currMonth, currYear);
 }
 
 /**
@@ -147,16 +147,12 @@ function addTask() {
 }
 
 // Function to display the calendar
-function displayCalendar(mnth, yr){
-    console.log("BUILDING CALENDAR");
-    // Get calendar day of first day in given month
-    let first = new Date(yr, mnth, 1);
-
-    // Get weekday 0-6
-    let firstDay = first.getDay();
+function displayCalendar(day, mnth, yr){
+    // initialize days of the week
+    let allDays = ["Sun", "Mon", "Tue", "Wed","Thu", "Fri", "Sat"];
 
     // Get and clear the table
-    let table = document.getElementById("table-week");
+    let table = document.getElementById("week-calendar");
     table.innerHTML = "";
 
     // Set previous month and year variables
@@ -167,54 +163,38 @@ function displayCalendar(mnth, yr){
         prevYear = yr-1;
     }
 
-    // Intitialize current day and cell day
-    let currMonthDay = 1;
+    // Intitialize cell day
     let cellNum
+    currMonthDay = day;
 
     // BUILD CALENDAR
     // Create row
     let row = document.createElement("tr");
 
     // Loop through number of columns
-    for (let j = 0; j < 7; j++) {
+    for (let j = 7; j > 0; j--) {
         // Create data for each table cell in the row
         let cell_data = document.createElement("td");
 
         // Fill in previous month into unfilled cells before first day of month
-        if (i == 0 && j < firstDay) {
+        if ((currMonthDay - j) < 1) {
             // Calculate dates of previous month
-            let prevMonthDay = daysInMonth(prevMonth, prevYear) - (firstDay - j) + 1;
-            // Number of current day
-            cellNum = document.createElement('span');
-            cellNum.textContent = prevMonthDay;
-            cellNum.className = "cell-date";
+            let prevMonthDay = daysInMonth(prevMonth, prevYear) - (currMonthDay - j) + 1;
 
-            // Add class date-num and other-month
-            cell_data.className = "other-month-date-num";
+            // current cell Date
+            cellNum = document.createElement('span'); 
+            let dayOfWeek = new Date(prevYear, prevMonth, prevMonthDay).getDay();
+            cellNum.textContent = allDays[dayOfWeek] + " " + prevMonth + "/" + prevMonthDay;
+            cellNum.className = "cell-date";
 
         } 
         // Fill in days of current month
         else {
-            // Number of current day
-            cellNum = document.createElement('span');
-            cellNum.textContent = currMonthDay;
+            // current cell Date
+            cellNum = document.createElement('span'); 
+            let dayOfWeek = new Date(yr, mnth, (currMonthDay-j)).getDay();
+            cellNum.textContent = allDays[dayOfWeek] + " " + mnth + "/" + (currMonthDay-j);
             cellNum.className = "cell-date";
-            // Add class date-num
-            cell_data.className = "curr-month-date-num";
-
-            // Current cell date
-            let cellDate = new Date(yr, mnth, currMonthDay);
-            // If cell is in the future
-            if (cellDate > date) {
-                cell_data.classList.add("future-date");
-            }
-            // If cell is today
-            else if (cellDate.toDateString() === date.toDateString()) {
-                cell_data.classList.add("current-date");
-            }
-
-            // Increment curr month day counter
-            currMonthDay++;
         }
         
         // Append cell number to new cell
