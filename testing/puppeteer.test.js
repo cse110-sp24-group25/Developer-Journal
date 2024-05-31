@@ -1,3 +1,5 @@
+// All of the commented out code in the beginning is there to display the browser when running tests locally
+
 //const puppeteer = require('puppeteer');
 
 // E2E Testing with Puppeteer
@@ -41,8 +43,6 @@ describe('Basic user path in homepage', () => {
   it('Click into journal, type, click out', async () => {
     console.log('Editing journal...');
 
-    const content = await page.content();
-    console.log(content);
     // Wait for page to load
     await page.waitForSelector('#textarea');
 
