@@ -20,4 +20,4 @@ jobs:
       run: live-server --port=5500 --no-browser &
       
     - name: Run Puppeteer tests
-      run: npx jest ./testing/puppeteer.test.js --config config/jest-puppetteer.config.js
+      run: npx jest ./testing/puppeteer.test.js --config config/jest-puppeteer.config.js
