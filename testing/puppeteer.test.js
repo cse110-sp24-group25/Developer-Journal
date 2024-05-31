@@ -1,29 +1,29 @@
-const puppeteer = require('puppeteer');
+//const puppeteer = require('puppeteer');
 
 // E2E Testing with Puppeteer
 describe('Basic user path in homepage', () => {
 
-  let browser;
-  let page;
+  // let browser;
+  // let page;
 
   // Open the webpage
   beforeAll(async () => {
-    // Launch a browser
-    browser = await puppeteer.launch({
-      headless: false, // Set to true for headless mode
-      defaultViewport: null, // Use full screen
-      args: ['--start-maximized'], // Start maximized
-      slowMo: 15 // Slow down the actions taken
-    });
+    // // Launch a browser
+    // browser = await puppeteer.launch({
+    //   headless: false, // Set to true for headless mode
+    //   defaultViewport: null, // Use full screen
+    //   args: ['--start-maximized'], // Start maximized
+    //   slowMo: 15 // Slow down the actions taken
+    // });
 
-    // Close the initial blank page
-    const initialPages = await browser.pages();
-    if (initialPages.length > 0) {
-      await initialPages[0].close();
-    }
+    // // Close the initial blank page
+    // const initialPages = await browser.pages();
+    // if (initialPages.length > 0) {
+    //   await initialPages[0].close();
+    // }
 
-    // Open a new page
-    page = await browser.newPage();
+    // // Open a new page
+    // page = await browser.newPage();
 
     // Visit dev journal website with github pages
     // await page.goto('https://cse110-sp24-group25.github.io/cse110-sp24-group25/source/homepage/homepage.html');
@@ -33,9 +33,9 @@ describe('Basic user path in homepage', () => {
   });
 
   // Close the browser after every test executes
-  afterAll(async () => {
-    await browser.close();
-  });
+  // afterAll(async () => {
+  //   await browser.close();
+  // });
 
   // Edit Journal
   it('Click into journal, type, click out', async () => {
