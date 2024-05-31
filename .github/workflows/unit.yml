@@ -14,4 +14,4 @@ jobs:
         run: npm install
 
       - name: Unit Test
-        run: npm test ./testing/__tests__/sum_tests.js
+        run: npm test ./testing/sum_tests.test.js
