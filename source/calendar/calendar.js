@@ -208,6 +208,13 @@ function displayCalendar(){
                 taskDiv.appendChild(taskList);
                 // Append tasklist div to new cell
                 cellData.appendChild(taskDiv);
+
+                
+                // Create buttons that link to speciic homepage
+                let aLink = document.createElement("a");
+                aLink.href = "../homepage/homepage.html";
+                aLink.className = "a-link";
+                cellData.appendChild(aLink);
                 
             }
             // Append new cell to row

@@ -11,7 +11,7 @@
   },
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:e2e": "jest"
+    "test:e2e": "jest --maxWorkers=1"
   },
   "type": "module",
   "jest": {
