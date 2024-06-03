@@ -30,19 +30,54 @@ describe('Basic user path in homepage', () => {
   //   await browser.close();
   // });
   // Edit Journal
-  it('Click next button', async () => {
-    console.log('Testing clicking of month');
-    // Click happiest rating button
-    const nextDate = await page.$('.next-date-btn');
-    await nextDate.click();
-    // Get date element
-    const date = await page.$('thead-weekheading');
-    // Check class name to include active
-    const class_name = await page.evaluate(date => {
-      return date.getAttribute('class');
-    }, date);
-    // Expect active got added to happy class name
-    expect(class_name).toBe("active");
+  it('Add a task and check addition', async () => {
+    console.log('Testing task addition...');
+    // Click the "Add Task" button
+    await page.click('.add-task-btn');
+    // Check the number of tasks in the task-container
+    const taskCount = await page.evaluate(() => {
+      return document.querySelectorAll('.task-list li').length;
+    });
+    // Expect the task count to increase by 1 after clicking the add button
+    expect(taskCount).toBe(1); // Modify the expected value based on initial number of tasks
   });
+
+
+
+  it('Resize window', async () => {
+    console.log('Testing window resize');
+    // Resize the window to a smaller size
+    await page.setViewport({ width: 600, height: 800 });
+    // Check the class name for the task-list to see if it has moved
+    const fullCalendar = await page.evaluate(() => {
+      return document.querySelector('.task-list').className;
+    });
+    expect(fullCalendar.includes('active')).toBe(false);
+  });
+
+  it('Click next month', async () => {
+    console.log('Testing to change months');
+    
+    const name = "June";
+    const monthHeader = await page.$('#month');
+
+
+
+    await page.evaluate(() => {
+      document.querySelector('#next-date-btn').click();
+    });    
+    
+
+    const textCont = await page.evaluate(() => {
+      return monthHeader => monthHeader.textContent;
+    });
+    expect(textCont).toBe(name);
+
+
+  });
+
+
+
+
   // TODO: Add more tests
 });
