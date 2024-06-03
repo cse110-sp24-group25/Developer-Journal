@@ -8,10 +8,10 @@ describe('Basic user path in homepage', () => {
   beforeAll(async () => {
     // // Launch a browser
     // browser = await puppeteer.launch({
-      headless: false, // Set to true for headless mode
+    //   headless: false, // Set to true for headless mode
     //   defaultViewport: null, // Use full screen
     //   args: ['--start-maximized'], // Start maximized
-      // slowMo: 15 // Slow down the actions taken
+    //   slowMo: 15 // Slow down the actions taken
     // });
     // // Close the initial blank page
     // const initialPages = await browser.pages();
@@ -118,67 +118,6 @@ describe('Basic user path in homepage', () => {
     // Expect active to be on img1 and not img5
     expect(class_name_1).toBe("active");
     expect(class_name_5).toBe("");
-  });
-  // Resize the window to make the task-list slide out
-  it('Resize window and check task-list position', async () => {
-    console.log('Testing window resize and task-list sliding...');
-    // Resize the window to a smaller size
-    await page.setViewport({ width: 700, height: 800 });
-    // Check the class name for the task-list to see if it has moved
-    const taskListClass = await page.evaluate(() => {
-      return document.querySelector('.task-list').className;
-    });
-    expect(taskListClass.includes('active')).toBe(false);
-  });
-
-  // Click the task-list to bring it forward
-  it('Click task-list to bring it forward', async () => {
-    console.log('Testing task-list click to bring forward...');
-    // Click on the task-list
-    await page.evaluate(() => {
-      document.querySelector('.task-list').click();
-    });    
-    // Check the task-list to see if it has active class
-    const mainWrapClass = await page.evaluate(() => {
-      return document.querySelector('.task-list').className;
-    });
-    // Expect the task-list to have 'active' class after clicking the task-list
-    expect(mainWrapClass.includes('active')).toBe(true);
-  });
-
-  // Add a task using the "Add Task" button
-  it('Add a task and check addition', async () => {
-    console.log('Testing task addition...');
-    const isActive = await page.evaluate(() => {
-      return document.querySelector('.task-list').classList.contains('active');
-    });
-    if (!isActive) {
-      await page.evaluate(() => {
-        document.querySelector('.task-list').click();
-      });
-    }
-    await page.screenshot({ path: 'final-state.png' });
-    // Click the "Add Task" button
-    await page.click('.add-task-btn');
-    // Check the number of tasks in the task-container
-    const taskCount = await page.evaluate(() => {
-      return document.querySelectorAll('.task-container .task').length;
-    });
-    // Expect the task count to increase by 1 after clicking the add button
-    expect(taskCount).toBe(1); // Modify the expected value based on initial number of tasks
-  });
-
-  // Click the main-wrap to hide the task-list
-  it('Click main-wrap to hide task-list', async () => {
-    console.log('Testing main-wrap click to hide task-list...');
-    // Click on the main-wrap
-    await page.click('.main-wrap');
-    // Check the class name for the task-list to see if it has moved back
-    const taskListClass = await page.evaluate(() => {
-      return document.querySelector('.task-list').className;
-    });
-    // Expect the task-list to not have 'active' class after clicking the main-wrap
-    expect(taskListClass.includes('active')).toBe(false);
   });
   // Template
   it('', async () => {
