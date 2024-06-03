@@ -123,7 +123,7 @@ describe('Basic user path in homepage', () => {
   it('Resize window and check task-list position', async () => {
     console.log('Testing window resize and task-list sliding...');
     // Resize the window to a smaller size
-    await page.setViewport({ width: 600, height: 800 });
+    await page.setViewport({ width: 700, height: 800 });
     // Check the class name for the task-list to see if it has moved
     const taskListClass = await page.evaluate(() => {
       return document.querySelector('.task-list').className;
@@ -149,6 +149,15 @@ describe('Basic user path in homepage', () => {
   // Add a task using the "Add Task" button
   it('Add a task and check addition', async () => {
     console.log('Testing task addition...');
+    const isActive = await page.evaluate(() => {
+      return document.querySelector('.task-list').classList.contains('active');
+    });
+    if (!isActive) {
+      await page.evaluate(() => {
+        document.querySelector('.task-list').click();
+      });
+    }
+    await page.screenshot({ path: 'final-state.png' });
     // Click the "Add Task" button
     await page.click('.add-task-btn');
     // Check the number of tasks in the task-container

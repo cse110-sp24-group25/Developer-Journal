@@ -42,22 +42,34 @@ button {
   background-color: white;
   box-shadow: 1px 1px lightgrey;
   overflow-y: scroll;
+
+  /* Hide scroll-bars for Firefox, Edge */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 @media (max-width: 800px) {
   .task-list {
-    transform: translateX(-90px);
+    transition: transform 0.3s ease;
+    transform: translateX(-90%);
   }
 
   .main-wrap {
+    transition: transform 0.3s ease;
     transform: translateX(-90px);
   }
-  .task-list.active, .main-wrap.active {
+  .task-list.active {
+    flex: 0 0 25%;
+    z-index: 100;
     transform: translateX(0);
   }
   .journal-past-wrap {
     display: block;
   }
+}
+/* Hide scroll-bar for Chrome, Safari, Opera*/
+.task-list::-webkit-scrollbar {
+  display: none;
 }
 
 /* Formatting for the task list header */
@@ -106,12 +118,13 @@ button {
   background: var(--main-color);
   padding: 10px;
   margin-top: 0.5em;
-  margin-bottom: 0.5;
+  margin-bottom: 0.5em;
   border-radius: 5px;
   position: relative;
   overflow: hidden;
   word-wrap: break-word;
   text-align: left;
+  list-style-type: none; /* Get rid of li bullet points */
   /* Set max height */
   transition: max-height 0.5s ease-in;
   max-height: 4em;
@@ -451,6 +464,8 @@ button:hover {
   padding-right: min(0.8em, 5%);
   padding-left: min(0.8em, 5%);
   padding-top: min(1em, 5%);
+
+  overflow: auto;
 }
 
 .feelings {
@@ -465,12 +480,13 @@ button:hover {
 }
 
 .rating-widget button img {
-  height: max(min(3em, 4vw), 50px);
+  height: max(min(3em, 6vw), 50px);
+  height: min(50px, 8vw);
   transition: 0.5s ease;
 }
 
 .rating-widget button img:hover {
-  height: max(min(4em, 6vw), 65px);
+  height: max(min(6em, 6vw), 65px);
   background: radial-gradient(circle, rgb(3, 128, 237) 0%, rgba(0, 0, 0, 0) 100%);
   border-radius: 50%;
   transition: 0.5s ease-in-out;
@@ -489,43 +505,6 @@ button:hover {
   padding-top: calc(1em - 1vw);
 }
 
-/* Add media queries for smaller screens */
-@media (max-width: 900px) {
-  .rating-widget h4{
-    font-size: 14px;
-  }
-  .rating-widget button img {
-    height: max(min(3.1em, 4.8vw), 30px);
-  }
-  .rating-widget button img:hover {
-    height: max(min(3.2em, 5vw), 45px);
-  }
-  .rating-widget img.active {
-    height: max(min(3.1em, 4.8vw), 30px);
-  }
-}
-
-@media (max-width: 800px) {
-  .rating-widget h4{
-    font-size: 13px;
-  }
-  .rating-widget button img {
-    height: max(min(3em, 4.8vw), 30px);
-  }
-  .rating-widget button img:hover {
-    height: max(min(3.2em, 5vw), 45px);
-  }
-  .rating-widget img.active {
-    height: max(min(3em, 4.8vw), 30px);
-  }
-}
-
-@media (max-width: 600px) {
-  .rating-widget h4{
-    font-size: 12px;
-  }
-}
-
 /* ********** End of rating ********** */
 
 
@@ -542,6 +521,8 @@ button:hover {
 
   border-radius: 1em;
 
+  transform: none;
+
 }
 
 /* ********** End Entry Content ********** */
@@ -552,6 +533,7 @@ button:hover {
   margin-right: 5%;
   margin-left: 2%;
   height: 19%;
+  font-size: min(14px, 4vw);
 }
 
 .past-week-grid {
@@ -577,6 +559,10 @@ button:hover {
   table-layout: fixed;
   margin: 0;
   height: 100%;
+
+  min-width: 40rem;
+
+  font-size: min(16px, 1vw);
 }
 
 /* Calendar Data Cell Styling */
@@ -661,3 +647,42 @@ td .task-div {
   z-index: 10;
 }
 /* End of past week */
+
+
+@media (max-width: 740px) {
+  main {
+    overflow-x: scroll;
+  }
+  .task-list {
+    flex: 0 0 25%;
+    z-index: 100000;
+    transition: transform 0.3s ease;
+    transform: translateX(-88%);
+  }
+
+  .main-wrap {
+    transform: translateX(-160px);
+
+    padding-left: max(2%, 0.5em);
+  }
+
+  .task-list.active {
+    transform: translateX(0%);
+  }
+  
+  .journal-past-wrap {
+    display: block;
+  }
+
+  .rating-widget h4{
+    font-size: 12px;
+  }
+  
+  .rating-widget {
+    overflow: auto;
+  }
+
+  .table-week {
+    font-size: 10px;
+  }
+}

@@ -15,8 +15,8 @@ function init() {
 
     displayWeek();
     initButtons();
-
     clickTaskList();
+
 }
 
 /**
@@ -56,8 +56,12 @@ function displayDate(date) {
  * Updates the global currDate to the next date and updates interface
  */
 function nextDate() {
-    currDate.setDate(currDate.getDate() + 1);
-    displayDate(formatDate(currDate));
+    let today = new Date();
+    if (currDate.getDate() != today.getDate()) {
+        currDate.setDate(currDate.getDate() + 1);
+        displayDate(formatDate(currDate));
+    }
+    
 }
 
 /**
@@ -197,7 +201,7 @@ function taskButtonsFunctionality(task) {
 
         if (task.className.includes('complete')) {
             task.classList.remove('complete');
-            const taskContainer = document.querySelector('.task-list');
+            const taskContainer = document.querySelector('.task-container');
             taskContainer.appendChild(task);
         }
         else {
@@ -327,18 +331,25 @@ function dateQuery() {
         currDate = new Date(components[2], components[0], components[1]);
     }
 }
-
 function clickTaskList() {
     const taskList = document.querySelector('.task-list');
-    const mainWrap = document.querySelector('.main-wrap');
-
-    taskList.addEventListener('click', function() {
+    const outSide = document.querySelector('.main-wrap');
+    taskList.addEventListener('click', function(event) {
+        if (event.target === taskList) {
+            if (window.innerWidth <= 800) { 
+                taskList.classList.toggle('active');
+            }
+        }
+    });
+    outSide.addEventListener('click', function(event){
         if (window.innerWidth <= 800) { 
-        this.classList.toggle('active');
-        mainWrap.classList.toggle('active');
-    }})
+            taskList.classList.remove('active');
+        }
+    });
 }
-
+/**
+ * Set task bullet point color on past week view
+ */
 function taskColor(){
     // Get all elements with class .task-item
     const taskItems = document.querySelectorAll('.task-item');
