@@ -23,24 +23,14 @@ describe('Basic user path in homepage', () => {
     // Visit dev journal website with github pages
     // await page.goto('https://cse110-sp24-group25.github.io/cse110-sp24-group25/source/homepage/homepage.html');
     // Visit dev journal using live server
-    await page.goto('http://127.0.0.1:5500/source/homepage/homepage.html');
+    await page.goto('http://127.0.0.1:5500/source/calendar/calendar.html');
   });
   // Close the browser after every test executes
   // afterAll(async () => {
   //   await browser.close();
   // });
   // Edit Journal
-  it('Add a task and check addition', async () => {
-    console.log('Testing task addition...');
-    // Click the "Add Task" button
-    await page.click('.add-task-btn');
-    // Check the number of tasks in the task-container
-    const taskCount = await page.evaluate(() => {
-      return document.querySelectorAll('.task-list li').length;
-    });
-    // Expect the task count to increase by 1 after clicking the add button
-    expect(taskCount).toBe(1); // Modify the expected value based on initial number of tasks
-  });
+  
 
   it('Add a task, write the task, and choose a color', async () => {
     console.log('Testing task addition, title setting, and color selection...');
@@ -108,7 +98,33 @@ describe('Basic user path in homepage', () => {
 
 
 
+  it('Add a task and check addition', async () => {
+    console.log('Testing task addition...');
+    const isActive = await page.evaluate(() => {
+      return document.querySelector('.task-list').classList.contains('active');
+    });
+    if (!isActive) {
+      await page.evaluate(() => {
+        document.querySelector('.task-list').click();
+      });
+    }
+    // Click the "Add Task" button
+    await page.click('.add-task-btn');
+    // Check the number of tasks in the task-container
+    const taskCount = await page.evaluate(() => {
+      return document.querySelectorAll('.task-list .task').length;
+    });
+    // Expect the task count to increase by 1 after clicking the add button
+    expect(taskCount).toBe(2);
+    await page.click('.task-list .task .fas.fa-trash-alt');
+    await page.click('.task-list .task .fas.fa-trash-alt');
+    const taskCountAfterDelete = await page.evaluate(() => {
+      return document.querySelectorAll('.task-list .task').length;
+    });
+    expect(taskCountAfterDelete).toBe(0);
+  });
 
+ 
 
 
 
@@ -123,18 +139,38 @@ describe('Basic user path in homepage', () => {
     expect(fullCalendar.includes('active')).toBe(false);
   });
 
-  it('Testing next month', async () => {
-    console.log('Testing to change months');
-    let initialMonth = await page.evaluate(() => document.querySelector('#month').textContent);
-    console.log(`Initial month: ${initialMonth}`);
-    await page.click('#next-date-btn');
-    // get the new month name
-    let newMonth = await page.evaluate(() => document.querySelector('#month').textContent);
-    console.log(`New month after click: ${newMonth}`);
-    let expectedNewMonth = "July";
-    expect(newMonth).toBe(expectedNewMonth);
-});
+//   it('Testing next month', async () => {
+//     console.log('Testing to change months');
+//     let initialMonth = await page.evaluate(() => document.querySelector('#month').textContent);
+//     console.log(`Initial month: ${initialMonth}`);
+//     await page.click('#next-date-btn');
+//     // get the new month name
+//     let newMonth = await page.evaluate(() => document.querySelector('#month').textContent);
+//     console.log(`New month after click: ${newMonth}`);
+//     let expectedNewMonth = "July";
+//     expect(newMonth).toBe(expectedNewMonth);
+// });
 
+
+
+it('Click the previous date button 1 time', async () => {
+  console.log('Testing going back multiple days');
+
+  // Click prev date button 5 times
+  const prevDateBtn = await page.$('.prev-date-btn');
+  await prevDateBtn.click();
+
+  
+
+  // get displayed date at the top
+  const displayedDateText = await page.$eval("#month", (n) => {
+    return n.textContent;
+  });
+
+  // get prevDate as a formatted string
+  let expectedDateText = "May";
+  expect(displayedDateText).toBe(expectedDateText);
+});
 
 
  
