@@ -11,7 +11,6 @@ describe('Basic user path in homepage', () => {
   it('Add a task, write the task, and choose a color', async () => {
     console.log('Testing task addition, title setting, and color selection...');
 
-    await page.setViewport({ width: 1200, height: 800 });
     await page.click('.add-task-btn');
   
     const taskInputSelector = '.task-list .task:last-child .task-input';
@@ -115,22 +114,13 @@ describe('Basic user path in homepage', () => {
     expect(fullCalendar.includes('active')).toBe(false);
   });
 
-//   it('Testing next month', async () => {
-//     console.log('Testing to change months');
-//     let initialMonth = await page.evaluate(() => document.querySelector('#month').textContent);
-//     console.log(`Initial month: ${initialMonth}`);
-//     await page.click('#next-date-btn');
-//     // get the new month name
-//     let newMonth = await page.evaluate(() => document.querySelector('#month').textContent);
-//     console.log(`New month after click: ${newMonth}`);
-//     let expectedNewMonth = "July";
-//     expect(newMonth).toBe(expectedNewMonth);
-// });
+
 
 
 
 it('Click the previous date button 1 time', async () => {
   console.log('Testing going back multiple days');
+  await page.setViewport({ width: 1200, height: 1600 });
 
   // Click prev date button 5 times
   const prevDateBtn = await page.$('.prev-date-btn');
@@ -143,12 +133,29 @@ it('Click the previous date button 1 time', async () => {
     return n.textContent;
   });
 
-  // get prevDate as a formatted string
+  // get prevDate 
   let expectedDateText = "May";
   expect(displayedDateText).toBe(expectedDateText);
 });
 
+it('Click the next date button 1 time', async () => {
+  console.log('Testing going forward once from yesterday');
 
+    // Click next date button 5 times
+    const nextDateBtn = await page.$('.next-date-btn');
+    await nextDateBtn.click();
+    
+    
+    
+    // get displayed date at the top
+    const displayedDateText = await page.$eval("#month", (n) => {
+      return n.textContent;
+    });
+
+    // get prevDate as a formatted string
+    let expectedDateText = "June";
+    expect(displayedDateText).toBe(expectedDateText);
+});
  
 
 
