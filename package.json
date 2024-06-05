@@ -20,7 +20,7 @@
   },
   "jest-puppeteer": {
     "launch": {
-      "headless": false,
+      "headless": true,
       "slowMo": 25,
       "defaultViewport": null
     }
