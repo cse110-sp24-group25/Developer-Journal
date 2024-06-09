@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: calendar/calendar.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: calendar/calendar.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const DISPLAY_TASK_COUNT = 2;
+const RATING_FILES_NAMES = ["1angry.png", "2upset.png", "3neutral.png", "4happy.png", "5overjoyed.png"];
+const PRODUCTIVITY_FILES_NAMES = ["1-icon.svg", "2-icon.svg", "3-icon.svg", "4-icon.svg", "5-icon.svg"];
+
+// Wait for window to load
+window.addEventListener('DOMContentLoaded', init);
+
+// Get current date globals
+var currDate = new Date();
+var month = currDate.getMonth();
+var year = currDate.getFullYear();
+
+// Defines confetti
+const confetti = window.confetti;
+
+/**
+ * Updates the global date variables to the current date.
+ */
+function updateDateGlobals() {
+    month = currDate.getMonth();
+    year = currDate.getFullYear();
+}
+
+/**
+ * Initializes the page when the DOM content is fully loaded.
+ */
+function init() {
+    // Initiaze the jump buttons
+    displayJump(year - 6, year + 5);
+    taskListViewHandler();
+
+    // Initially display the calendar, calendar header, and task colors
+    calendarHeader();
+    displayCalendar();
+
+    // Initialize the buttons 
+    initButtons();
+
+    loadTasks();
+}
+
+/**
+ * Initializes the buttons for adding tasks, navigating months, and other functionalities.
+ */
+function initButtons() {
+
+    const addTaskBtn = document.querySelector(".add-task-btn");
+    addTaskBtn.addEventListener("click", () => {
+        addTask();
+    });
+
+    // Previous month button
+    let prevBtn = document.querySelector(".prev-date-btn");
+    prevBtn.addEventListener('click', prev);
+
+    // Next month button
+    let nextBtn = document.querySelector(".next-date-btn");
+    nextBtn.addEventListener('click', next);
+
+    // Jump header buttons
+    // List of months
+    let monthJumpBtn = document.querySelectorAll(".month-btn");
+    monthJumpBtn.forEach(btn => {
+        btn.addEventListener("click", () => {
+            let monthValue = btn.getAttribute("value");
+            jump(monthValue, year);
+        });
+    });
+    // List of years
+    let yearJumpBtn = document.querySelectorAll(".year-btn");
+    yearJumpBtn.forEach(btn => {
+        btn.addEventListener("click", () => {
+            let yearValue = btn.getAttribute("value");
+            jump(month, yearValue);
+        });
+    });
+
+    // Resize window for responsiveness
+    window.addEventListener('resize', windowWidth);
+
+    // Add left/right arrows to goto prev/next months
+    window.addEventListener('keydown', function(event) {
+        if (event.key === "ArrowLeft") {
+            prev();
+        } else if (event.key === "ArrowRight") {
+            next();
+        }
+    });
+}
+
+/**
+ * Updates the global currDate to the next date and displays the next month.
+ */
+function next(){
+    // Increment the month
+    currDate.setMonth(currDate.getMonth() + 1);
+    updateDateGlobals();
+    displayCalendar();
+}
+
+/**
+ * Updates the global currDate to the previous month and displays the previous month's calendar.
+ */
+function prev() {
+    // Decrement the month
+    currDate.setMonth(currDate.getMonth() - 1);
+    updateDateGlobals();
+    displayCalendar();
+}
+
+/**
+ * Adds a task to the task list upon "Add Task" button click.
+ * 
+ * @param {boolean} [loadTask=false] - Indicates whether the task is being loaded from storage.
+ * @returns {HTMLElement} - The newly created task element.
+ */
+function addTask(loadTask = false) {
+    // Add a task to an element of task container
+    const taskList = document.querySelector(".task-container");
+    const task = document.createElement("li");
+    task.className = "task";
+    
+    // Add it at the first row
+    task.insertAdjacentHTML("beforeend", `
+        &lt;div class="check-input-wrap">
+            &lt;button id="task1" class="task-checkbox" aria-label="Task Checkbox">&lt;/button>
+            &lt;div contenteditable="true" class="task-input" placeholder="Add a task..." onkeypress="return this.innerText.length &lt;= 180;">&lt;/div>
+        &lt;/div>
+        &lt;div class="color-buttons">
+            &lt;button id="purple" class="color-button" aria-label="Purle">&lt;/button>
+            &lt;button id="green" class="color-button" aria-label="Green">&lt;/button>
+            &lt;button id="blue" class="color-button" aria-label="Blue">&lt;/button>
+            &lt;button id="pink" class="color-button" aria-label="Pink">&lt;/button>
+            &lt;button id="grey" class="color-button" aria-label="Grey">&lt;/button>
+        &lt;/div>
+        &lt;img class="trash-icon" src="../icons/trash-icon.svg" alt="Remove">
+    `);
+    task.querySelector(".task-input").addEventListener("input", saveTasks);
+
+
+    taskList.append(task);
+
+    // Listener to stop editing when user presses enter
+    const task_name = task.querySelector(".task-input");
+    task_name.addEventListener('keydown', function (event) {
+        // Shift + Enter pressed, insert a line break
+        if (event.key == 'Enter') {
+            // Enter pressed, end editing
+            if (!event.shiftKey) {
+                // Prevent default behavior of Enter key
+                event.preventDefault(); 
+
+                // Remove focus from the element
+                task_name.blur(); 
+            }
+        }
+    });
+
+    // Auto click into the task name text box
+    if (loadTask == false){
+        setTimeout(() => {
+            task_name.focus();
+            const selection = document.getSelection();
+            if (selection.rangeCount > 0) {
+                selection.collapseToEnd();
+            }
+        }, 0);
+    }  
+
+    // Add functionality to task buttons
+    taskButtonsFunctionality(task);
+
+    return task;
+}
+
+/**
+ * Adds button functionality to a task upon creation.
+ * 
+ * @param {HTMLElement} task - The task element to add functionality to.
+ */
+function taskButtonsFunctionality(task) {
+    // Implement color changing functionality 
+    const colorBtns = task.querySelectorAll(".color-button");
+    colorBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            let color;
+            switch (btn.id) {
+                case "purple":
+                    color = "#C380CC";
+                    break;
+                case "green":
+                    color = "#91DC79";
+                    break;
+                case "blue":
+                    color = "#6BB1D9";
+                    break;
+                case "pink":
+                    color = "#EEBAE9";
+                    break;
+                default:
+                    color = "var(--main-color)";
+            }
+            task.style['background-color'] = color;
+            saveTasks();
+        });
+    });
+
+    // Trash icon delete functionality
+    const deleteIcon = task.querySelector(".trash-icon");
+    deleteIcon.addEventListener("click", () => {
+        task.remove();
+        saveTasks();
+    });
+
+    // Checkbox move to completed tasks functionality
+    const checkbox = task.querySelector(".task-checkbox");
+    checkbox.addEventListener('click', function () {
+
+        // Add or remove completed from class name
+        if (task.className.includes('complete')) {
+            task.classList.remove('complete');
+            const taskContainer = document.querySelector('.task-container');
+            taskContainer.appendChild(task);
+            task.addEventListener("blur", saveTasks);
+            saveTasks();
+        }
+        else {
+            task.classList.add('complete');
+            saveCompleted(task);
+            task.remove()
+            saveTasks();
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    });
+}
+
+/**
+ * Expands task list from collapsed state.
+ */
+function taskListViewHandler() {
+    const taskList = document.querySelector('.task-list');
+    const taskWrap = document.querySelector('.task-wrapper');
+    const outSide = document.querySelector('.full-calendar');
+    taskList.addEventListener('click', function(event) {
+        if (event.target === taskList) {
+            if (window.innerWidth &lt;= 800) { 
+                taskList.classList.toggle('active');
+                taskWrap.classList.toggle('active');
+            }
+        }
+    });
+    outSide.addEventListener('click', function(){
+        if (window.innerWidth &lt;= 800) { 
+            taskList.classList.remove('active');
+            taskWrap.classList.remove('active');
+        }
+    });
+}
+
+/**
+ * Saves the completed tasks for a specific day.
+ * 
+ * @param {HTMLElement} completedTaskElement - The task element that was completed.
+ */
+function saveCompleted(completedTaskElement) {
+    let data = getJournal();
+    let dateText = new Date().toLocaleDateString();
+    let completedTask = loadFromStorage(data, dateText, "completedTasks") || [];
+    let taskName = completedTaskElement.querySelector('.task-input').textContent;
+    let taskColor = completedTaskElement.style['background-color']
+    completedTask.push({
+        text: taskName,
+        color: taskColor,
+    });
+    saveToStorage(data, dateText, "completedTasks", completedTask);
+    localStorage.setItem("journals", JSON.stringify(data));
+    displayCalendar();
+}
+
+/**
+ * Displays the calendar for the current month.
+ */
+function displayCalendar() {
+    // Get body and clear current calendar
+    let tbody = document.getElementById("tbody-calendar");
+    tbody.innerHTML = "";
+
+    // Initialize list of months
+    let allMonths = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    // Get day of the week of first day in given month
+    let currCalendarMonth = new Date(year, month, 1);
+    let today = new Date();
+    let dayOffset = -(currCalendarMonth.getDay());
+
+    // Get month and year header
+    let monthHeader = document.getElementById("month");
+    let yearHeader = document.getElementById("year");
+    monthHeader.textContent = allMonths[parseInt(month, 10)];
+    yearHeader.textContent = year;
+
+    // Build Calendar
+    // Loop through number of rows
+    let currDay;
+    for (let i = 0; i &lt; 6; i++) {
+        // Create rows
+        let row = document.createElement("tr");
+
+        // Loop through number of columns
+        for (let j = 0; j &lt; 7; j++) {
+            // Create data for each table cell in the row
+            let cellData = document.createElement("td");
+
+            // Create span for cell number
+            let cellNum = document.createElement('span');
+
+            // Add offset to first date in calendar
+            if (i === 0 &amp;&amp; j === 0) {
+                currCalendarMonth.setDate(currCalendarMonth.getDate() + dayOffset);
+                currDay = currCalendarMonth.getDate();
+            }
+            // Increment date by one
+            else {
+                currCalendarMonth.setDate(currCalendarMonth.getDate() + 1);
+                currDay = currCalendarMonth.getDate();
+            }
+            // Add number and class to cellNum
+            cellNum.textContent = currDay;
+            cellNum.className = "cell-date";
+            let cellDate = new Date(currCalendarMonth);
+
+            // If current month
+            if (currCalendarMonth.getMonth() === currDate.getMonth()) {
+                cellData.classList.add("curr-month-date-num");
+            }
+            // If other month
+            else {
+                cellData.classList.add("other-month-date-num");
+            }
+
+            // If cell is today
+            if (currCalendarMonth.toDateString() === today.toDateString()) {
+                cellData.classList.add("current-date");
+            }
+            // If cell is in the past
+            else if (currCalendarMonth &lt; today) {
+                cellData.classList.add("past-date");
+            }
+            // If cell is in the future
+            else {
+                cellData.classList.add("future-date");
+            }
+
+            // Add cell number to calendar cell
+            cellData.appendChild(cellNum);
+
+            if (cellDate &lt;= today) {
+                loadCellDataTest(cellData, currCalendarMonth);
+            }
+            // Append new cell to row
+            row.appendChild(cellData);
+        }
+        // Append row to table
+        tbody.appendChild(row);
+    }
+    // Change the header if the window size is too small
+    windowWidth();
+
+    // Get the width of month and align the year 
+    let monthWidth = document.getElementById('month-dropdown').offsetWidth;
+    document.getElementById('year-dropdown').style.left = monthWidth + 5 + 'px';
+}
+
+/**
+ * Loads cell data such as rating, productivity, and tasks for a specific date in the calendar.
+ * 
+ * @param {HTMLElement} cellData - The table cell element to populate with data.
+ * @param {Date} currCalendarMonth - The current month being displayed in the calendar.
+ */
+function loadCellDataTest(cellData, currCalendarMonth) {
+    let journals = getJournal();
+    let dateText = currCalendarMonth.toLocaleDateString();
+
+    let rating = loadFromStorage(journals, dateText, "rating");
+    let productivity = loadFromStorage(journals, dateText, "productivity");
+    let tasks = loadFromStorage(journals, dateText, "completedTasks");
+
+    if (rating != null) {
+        // Add sentiment icon
+        let sentimentIcon = document.createElement("img");
+        sentimentIcon.src = `../icons/${RATING_FILES_NAMES[rating - 1]}`;
+        sentimentIcon.alt = "sentiment icon";
+        sentimentIcon.className = "sentiment-icon";
+
+        // Append sentiment icon to new cell
+        cellData.appendChild(sentimentIcon);
+    }
+
+    if (productivity != null) {
+        // Add productivity icon
+        let productivityIcon = document.createElement("img");
+        productivityIcon.src = `../icons/${PRODUCTIVITY_FILES_NAMES[productivity - 1 - 5]}`;
+        productivityIcon.alt = "productivity icon";
+        productivityIcon.className = "productivity-icon";
+
+        // Append sentiment icon to new cell
+        cellData.appendChild(productivityIcon);
+    }
+
+    // Add tasklist in calendar cell
+    // Create tasklist div
+    let taskDiv = document.createElement("div");
+    taskDiv.className = "task-div";
+    
+    // Create unordered list
+    let taskList = document.createElement("ul");
+    taskList.className = "task-ul";
+
+    if (tasks != null) {
+        for (let i = 0; i &lt; tasks.length &amp;&amp; i &lt; DISPLAY_TASK_COUNT; i++) {
+            let taskItem = document.createElement("li");
+            taskItem.textContent = tasks[i]["text"];
+            taskItem.className = "task-item";
+            taskItem.style.setProperty('--task-color', tasks[i]["color"]);
+            taskList.appendChild(taskItem);
+        }
+
+        if (tasks.length > DISPLAY_TASK_COUNT) {
+            // Handle extra tasks in calendar view
+            let taskExtra = document.createElement("li");
+            taskExtra.textContent = `${tasks.length - DISPLAY_TASK_COUNT} more tasks`;
+            taskExtra.className = "task-indicator";
+            taskList.appendChild(taskExtra);
+        }
+    }
+
+    // Append taskList to task div;
+    taskDiv.appendChild(taskList);
+
+    // Append tasklist div to new cell
+    cellData.appendChild(taskDiv);
+
+    // Create buttons that link to speciic homepage and extract selected date
+    let aLink = document.createElement("a");
+    let dayLink = currCalendarMonth.getDate();
+    let monthLink = currCalendarMonth.getMonth();
+    let yearLink = currCalendarMonth.getFullYear()
+
+    // Query is in format ?date=month-day-year
+    aLink.href = `../homepage/homepage.html?date=${monthLink}-${dayLink}-${yearLink}`;
+    aLink.className = "a-link";
+    aLink.setAttribute("aria-label", `Link to details for ${monthLink + 1}/${dayLink}/${yearLink}`);
+    cellData.appendChild(aLink);
+}
+
+/**
+ * Generates a dropdown for year and month selection.
+ * 
+ * @param {number} startYear - The start year for the dropdown range.
+ * @param {number} endYear - The end year for the dropdown range.
+ */
+function displayJump(startYear, endYear) {
+    // Years
+    let yearDropdown = document.getElementById("year-dropdown")
+
+    // Loop through year range and append to list
+    for (let yr = startYear; yr &lt; endYear + 1; yr++) {
+        let yearJump = document.createElement("button");
+        yearJump.value = yr;
+        yearJump.textContent = yr;
+        yearJump.className = "year-btn";
+        yearDropdown.appendChild(yearJump);
+
+    }
+
+    // Months
+    let allMonths = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    
+    // Loop through months and append to list
+    let monthDropdown = document.getElementById("month-dropdown")
+    for (let mnth = 0; mnth &lt; 12; mnth++) {
+        let monthJump = document.createElement("button");
+        monthJump.value = mnth;
+        monthJump.textContent = allMonths[parseInt(mnth, 10)];
+        monthJump.className = "month-btn";
+        monthDropdown.appendChild(monthJump);
+    }
+}
+
+/**
+ * Function to jump to a specific month and year.
+ * 
+ * @param {number} mnth - month to jump to
+ * @param {number} yr - year to jump to
+ */
+function jump(mnth, yr) {
+    currDate = new Date(yr, mnth)
+    updateDateGlobals();
+    displayCalendar();
+}
+
+/**
+ * Creates header of the calendar.
+ */
+function calendarHeader(){
+    // Initialize list of days of the week
+    let allDays = ["Sun", "Mon", "Tue", "Wed","Thu", "Fri", "Sat"];
+
+    // Header of Days of the week
+    let thead = document.getElementById("thead-weekheadings");
+    let headerRow = document.createElement("tr");
+
+    // Loop through allDays list and append day of week to row
+    for (let dow of allDays) {
+        let headerData = document.createElement("th");
+        headerData.textContent = dow;
+        headerRow.appendChild(headerData);
+    }
+    thead.appendChild(headerRow);
+}
+
+/**
+ * Adjusts the month header text based on the window width.
+ */
+function windowWidth() {
+    if (window.innerWidth &lt; 920) {
+        // Initialize list of abbreviated months
+        let allMonths = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
+        ];
+
+        let monthHeader = document.getElementById("month");
+        monthHeader.textContent = allMonths[parseInt(month, 10)];
+    }
+    else {
+        // Initialize list of months
+        let allMonths = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+        let monthHeader = document.getElementById("month");
+        monthHeader.textContent = allMonths[parseInt(month, 10)];
+    }
+
+    // Get the width of month and align the year 
+    let monthWidth = document.getElementById('month-dropdown').offsetWidth;
+    document.getElementById('year-dropdown').style.left = monthWidth + 5 + 'px';
+}
+
+/* ********** Storage and Population ********** */
+
+// Get the all relevent elements from page
+const tasks = document.querySelector(".task-container");
+
+// Save journal entry and tasks to local storage on page unload
+window.onbeforeunload = function () {
+    saveTasks()
+}
+
+/**
+ * Save journal entry to local storage.
+ * 
+ * @param {string} data - Journal entry text in parsed json format.
+ * @param {string} dateText - Date of the journal entry in locale date string format.
+ * @param {string} key - Key to store the value under.
+ * @param {string} value - Value to store.
+ */
+function saveToStorage(data, dateText, key, value) {
+    if (!(dateText in data)) {
+        data[dateText] = {}
+    }
+    data[dateText][key] = value;
+}
+
+/**
+ * Load journal entry from local storage.
+ * 
+ * @param {Object} data - Journal entry text in parsed JSON format.
+ * @param {string} dateText - Date of the journal entry in locale date string format.
+ * @param {string} key - Key to get the value from.
+ * @returns {string|null} - Value of the key in the data or null if not found.
+ */
+function loadFromStorage(data, dateText, key) {
+    if (!(dateText in data)) {
+        return null;
+    }
+    return data[dateText][key];
+}
+
+/**
+ * Get journal entry from local storage.
+ * 
+ * @returns {Object} - Journal entry text in parsed json format.
+ */
+function getJournal() {
+    let data = JSON.parse(localStorage.getItem("journals"))
+    if (data == null) {
+        data = {}
+    }
+    return data;
+}
+
+/**
+ * Save tasks to local storage.
+ */
+function saveTasks() {
+    let tasks = [];
+    document.querySelectorAll('.task-container li').forEach(task => {
+        let taskName = task.querySelector('.task-input').textContent;
+        let taskColor = task.style['background-color']
+        tasks.push({
+            text: taskName,
+            color: taskColor,
+        });
+    });
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+/**
+ * Get tasks from local storage.
+ *
+ * @returns {string} - Tasks in parsed json format or empty array if no tasks.
+ */
+function getTasks() {
+    let storedTasks = localStorage.getItem("tasks");
+    return storedTasks ? JSON.parse(storedTasks) : [];
+}
+
+/**
+ * Load tasks from local storage.
+ */
+function loadTasks() {
+    let tasks = getTasks();
+    if (tasks.length > 0) {
+        tasks.forEach(task => {
+            let curLi = addTask(true);
+            curLi.querySelector(".task-input").textContent = task['text']
+            curLi.style['background-color'] = task['color']
+        });
+    }
+
+}
+
+// Save journal entry and tasks to local storage on events.
+tasks.addEventListener("blur", saveTasks)
+tasks.addEventListener("change", saveTasks)</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#addTask">addTask</a></li><li><a href="global.html#calendarHeader">calendarHeader</a></li><li><a href="global.html#dateQuery">dateQuery</a></li><li><a href="global.html#displayCalendar">displayCalendar</a></li><li><a href="global.html#displayDate">displayDate</a></li><li><a href="global.html#displayJump">displayJump</a></li><li><a href="global.html#displayWeek">displayWeek</a></li><li><a href="global.html#formatDate">formatDate</a></li><li><a href="global.html#getCompleted">getCompleted</a></li><li><a href="global.html#getJournal">getJournal</a></li><li><a href="global.html#getTasks">getTasks</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initButtons">initButtons</a></li><li><a href="global.html#jump">jump</a></li><li><a href="global.html#loadAll">loadAll</a></li><li><a href="global.html#loadCellData">loadCellData</a></li><li><a href="global.html#loadCellDataTest">loadCellDataTest</a></li><li><a href="global.html#loadCompleted">loadCompleted</a></li><li><a href="global.html#loadFromStorage">loadFromStorage</a></li><li><a href="global.html#loadJournal">loadJournal</a></li><li><a href="global.html#loadTasks">loadTasks</a></li><li><a href="global.html#loadWidgets">loadWidgets</a></li><li><a href="global.html#next">next</a></li><li><a href="global.html#nextDate">nextDate</a></li><li><a href="global.html#prev">prev</a></li><li><a href="global.html#prevDate">prevDate</a></li><li><a href="global.html#saveCompleted">saveCompleted</a></li><li><a href="global.html#saveJournal">saveJournal</a></li><li><a href="global.html#saveTasks">saveTasks</a></li><li><a href="global.html#saveToStorage">saveToStorage</a></li><li><a href="global.html#saveWidgets">saveWidgets</a></li><li><a href="global.html#selectWidget">selectWidget</a></li><li><a href="global.html#taskButtonsFunctionality">taskButtonsFunctionality</a></li><li><a href="global.html#taskListViewHandler">taskListViewHandler</a></li><li><a href="global.html#unselectAllCompleted">unselectAllCompleted</a></li><li><a href="global.html#unselectAllWidgets">unselectAllWidgets</a></li><li><a href="global.html#updateDateGlobals">updateDateGlobals</a></li><li><a href="global.html#windowWidth">windowWidth</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.3</a> on Fri Jun 07 2024 22:03:12 GMT+0000 (Coordinated Universal Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

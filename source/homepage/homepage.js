@@ -7,6 +7,9 @@ window.addEventListener('DOMContentLoaded', init);
 // Get current date global
 var currDate = new Date();
 
+// Defines confetti
+const confetti = window.confetti;
+
 /**
  * Initializes all necessary components
  */
@@ -193,15 +196,15 @@ function addTask(loadTask = false) {
 	task.setAttribute("class", "task");
 	task.insertAdjacentHTML("beforeend", `
         <div class="check-input-wrap">
-            <button id="task1" class="task-checkbox"></button>
+            <button id="task1" class="task-checkbox" aria-label="Task Checkbox"></button>
             <div contenteditable="true" class="task-input" placeholder="Add a task..." onkeypress="return this.innerText.length <= 180;"></div>
         </div>
         <div class="color-buttons">
-            <button id="purple" class="color-button"></button>
-            <button id="green" class="color-button"></button>
-            <button id="blue" class="color-button"></button>
-            <button id="pink" class="color-button"></button>
-            <button id="grey" class="color-button"></button>
+            <button id="purple" class="color-button" aria-label="Purle"></button>
+            <button id="green" class="color-button" aria-label="Green"></button>
+            <button id="blue" class="color-button" aria-label="Blue"></button>
+            <button id="pink" class="color-button" aria-label="Pink"></button>
+            <button id="grey" class="color-button" aria-label="Grey"></button>
         </div>
         <img class="trash-icon" src="../icons/trash-icon.svg" alt="Remove">
     `);
@@ -276,33 +279,39 @@ function taskButtonsFunctionality(task) {
 		});
 	});
 
-    // Trash icon delete functionality
-    const deleteIcon = task.querySelector(".trash-icon");
-    deleteIcon.addEventListener("click", () => {
-        task.remove();
-        saveCompleted();
-        saveTasks();
-    });
+  // Trash icon delete functionality
+  const deleteIcon = task.querySelector(".trash-icon");
+  deleteIcon.addEventListener("click", () => {
+    task.remove();
+    saveCompleted();
+    saveTasks();
+  });
 
-	// Checkbox move to Completed Tasks functionality
-	const checkbox = task.querySelector(".task-checkbox");
-	checkbox.addEventListener('click', function () {
-		if (task.className.includes('complete')) {
-			task.classList.remove('complete');
-			const taskContainer = document.querySelector('.task-container');
-			taskContainer.appendChild(task);
-			task.addEventListener("blur", saveTasks);
-			saveCompleted();
-			saveTasks();
-		}
-		else {
-			task.classList.add('complete');
-			const completedTaskContainer = document.querySelector('.completed-task-container');
-			completedTaskContainer.appendChild(task);
-			saveCompleted();
-			saveTasks();
-		}
-	});
+  // Checkbox move to Completed Tasks functionality
+  const checkbox = task.querySelector(".task-checkbox");
+  checkbox.addEventListener('click', function() {
+    if (task.className.includes('complete')) {
+      task.classList.remove('complete');
+      const taskContainer = document.querySelector('.task-container');
+      taskContainer.appendChild(task);
+      task.addEventListener("blur", saveTasks);
+      saveCompleted();
+      saveTasks();
+    }
+    else {
+      task.classList.add('complete');
+      const completedTaskContainer = document.querySelector('.completed-task-container');
+      completedTaskContainer.appendChild(task);
+      saveCompleted();
+      saveTasks();
+
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+  });
 }
 
 /**
@@ -598,88 +607,79 @@ function loadWidgets() {
  * @param {Date} currWeekDay - Date to populate data within
  */
 function loadCellData(cellData, currWeekDay) {
-	let journals = getJournal();
-	let dateText = currWeekDay.toLocaleDateString();
+  let journals = getJournal();
+  let dateText = currWeekDay.toLocaleDateString();
 
-	let rating = loadFromStorage(journals, dateText, "rating");
-	let productivity = loadFromStorage(journals, dateText, "productivity");
-	let tasks = loadFromStorage(journals, dateText, "completedTasks");
+  let rating = loadFromStorage(journals, dateText, "rating");
+  let productivity = loadFromStorage(journals, dateText, "productivity");
+  let tasks = loadFromStorage(journals, dateText, "completedTasks");
 
-	if (rating != null) {
+  if (rating != null) {
 
-		// Add sentiment icon
-		let sentimentIcon = document.createElement("img");
-		sentimentIcon.src = `../icons/${RATING_FILES_NAMES[rating - 1]}`;
-		sentimentIcon.alt = "sentiment icon";
-		sentimentIcon.className = "sentiment-icon";
+    // Add sentiment icon
+    let sentimentIcon = document.createElement("img");
+    sentimentIcon.src = `../icons/${RATING_FILES_NAMES[rating - 1]}`;
+    sentimentIcon.alt = "sentiment icon";
+    sentimentIcon.className = "sentiment-icon";
 
-		// Append sentiment icon to new cell
-		cellData.appendChild(sentimentIcon);
-	}
+    // Append sentiment icon to new cell
+    cellData.appendChild(sentimentIcon);
+  }
 
-	if (productivity != null) {
+  if (productivity != null) {
 
-		// Add productivity icon
-		let productivityIcon = document.createElement("img");
-		productivityIcon.src = `../icons/${PRODUCTIVITY_FILES_NAMES[productivity - 1 - 5]}`;
-		productivityIcon.alt = "productivity icon";
-		productivityIcon.className = "productivity-icon";
+    // Add productivity icon
+    let productivityIcon = document.createElement("img");
+    productivityIcon.src = `../icons/${PRODUCTIVITY_FILES_NAMES[productivity - 1 - 5]}`;
+    productivityIcon.alt = "productivity icon";
+    productivityIcon.className = "productivity-icon";
 
-		// Append sentiment icon to new cell
-		cellData.appendChild(productivityIcon);
-	}
+    // Append sentiment icon to new cell
+    cellData.appendChild(productivityIcon);
+  }
 
-	// Add tasklist in calendar cell
-	let taskDiv = document.createElement("div");
-	taskDiv.className = "task-div";
-	let taskList = document.createElement("ul");
-	taskList.className = "task-ul";
+  // Add tasklist in calendar cell
+  let taskDiv = document.createElement("div");
+  taskDiv.className = "task-div";
+  let taskList = document.createElement("ul");
+  taskList.className = "task-ul";
 
-	// Format task
-	if (tasks != null) {
-		for (let i = 0; i < tasks.length && i < DISPLAY_TASK_COUNT; i++) {
-			let taskItem = document.createElement("li");
-			taskItem.textContent = tasks[i]["text"];
-			taskItem.className = "task-item";
-			if (tasks[i]["color"] === "var(--main-color)") {
-				if (document.documentElement.hasAttribute('theme')) {
-					taskItem.style.setProperty('--task-color', "white");
-				}
-				else {
-					taskItem.style.setProperty('--task-color', "black");
-				}
-			}
-			else {
-				taskItem.style.setProperty('--task-color', tasks[i]["color"]);
-			}
-			taskList.appendChild(taskItem);
-		}
+  // Format task
+  if (tasks != null) {
+    for (let i = 0; i < tasks.length && i < DISPLAY_TASK_COUNT; i++) {
+        let taskItem = document.createElement("li");
+        taskItem.textContent = tasks[i]["text"];
+        taskItem.className = "task-item";
+        taskItem.style.setProperty('--task-color', tasks[i]["color"]);
+        taskList.appendChild(taskItem);
+    }
 
-		// Extra tasks are indicated but not displayed
-		if (tasks.length > DISPLAY_TASK_COUNT) {
-			let taskExtra = document.createElement("li");
-			taskExtra.textContent = `${tasks.length - DISPLAY_TASK_COUNT} more tasks`;
-			taskExtra.className = "task-indicator";
-			taskList.appendChild(taskExtra);
-		}
-	}
+    // Extra tasks are indicated but not displayed
+    if (tasks.length > DISPLAY_TASK_COUNT) {
+        let taskExtra = document.createElement("li");
+        taskExtra.textContent = `${tasks.length - DISPLAY_TASK_COUNT} more tasks`;
+        taskExtra.className = "task-indicator";
+        taskList.appendChild(taskExtra);
+    }
+  }
 
-	// Create buttons that link to speciic homepage and extract selected date
-	let aLink = document.createElement("a");
-	let dayLink = currWeekDay.getDate();
-	let monthLink = currWeekDay.getMonth();
-	let yearLink = currWeekDay.getFullYear()
+  // Create buttons that link to speciic homepage and extract selected date
+  let aLink = document.createElement("a");
+  let dayLink = currWeekDay.getDate();
+  let monthLink = currWeekDay.getMonth();
+  let yearLink = currWeekDay.getFullYear()
 
-	// Query is in format ?date=month-day-year
-	aLink.href = `../homepage/homepage.html?date=${monthLink}-${dayLink}-${yearLink}`;
-	aLink.className = "a-link";
-	cellData.appendChild(aLink);
+  // Query is in format ?date=month-day-year
+  aLink.href = `../homepage/homepage.html?date=${monthLink}-${dayLink}-${yearLink}`;
+  aLink.className = "a-link";
+  aLink.setAttribute("aria-label", `Link to details for ${monthLink + 1}/${dayLink}/${yearLink}`);
+  cellData.appendChild(aLink);
 
-	// Append taskList to task div;
-	taskDiv.appendChild(taskList);
+  // Append taskList to task div;
+  taskDiv.appendChild(taskList);
 
-	// Append tasklist div to new cell
-	cellData.appendChild(taskDiv);
+  // Append tasklist div to new cell
+  cellData.appendChild(taskDiv);
 }
 
 /**

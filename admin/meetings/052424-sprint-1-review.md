@@ -47,3 +47,6 @@ Opportunities：
 
 Threats：
 - attendance and tardiness
+
+# Retrospective Board
+![img](../misc/CSE110-Retrospective1.png)

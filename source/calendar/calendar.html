@@ -1,24 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8" />
-	<!-- Title -->
-	<title>Calendar</title>
-	<!-- CSS File -->
-	<link rel="stylesheet" href="calendar.css" />
-	<!-- Icon  -->
-	<link rel="icon" type="image/x-icon" href="/source/icons/website-icon.ico">
-	<!-- Font style -->
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link
-		href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-		rel="stylesheet">
+  <meta charset="UTF-8" />
+  <!-- Title -->
+  <title>Dev Calendar</title>
+  <!-- CSS File -->
+  <link rel="stylesheet" href="calendar.css" />
+  <!-- Icon  -->
+  <link rel="icon" type="image/x-icon" href="../icons/website-icon.ico">
+  <!-- Font style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A calendar application to manage tasks and events efficiently.">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 </head>
-
 <body>
 	<main>
-
 		<!-- Task list sidebar -->
 		<div class="task-list">
 			<!-- HEader with title and add task button -->
@@ -36,10 +34,17 @@
 				</ul>
 			</div>
 		</div>
-
+    <!--Contain header bar-->
+    <section class="top-bar">
+      <div class="date-header-wrap">
+        <div class="date-header">
+          <!-- Buttons to change the date -->
+          <div class="date-header-buttons">
+            <button class="prev-date-btn" aria-label="Previous Month"></button>
+            <button class="next-date-btn" aria-label="Next Month"></button>
+          </div>
 		<!-- Calendar -->
 		<div class="full-calendar">
-
 			<!--Contain header bar-->
 			<section class="top-bar">
 				<div class="date-header-wrap">
@@ -49,7 +54,6 @@
 							<button class="prev-date-btn"></button>
 							<button class="next-date-btn"></button>
 						</div>
-
 						<!-- Calendar header and date jump -->
 						<div class="jump-header">
 							<!-- Month jump dropdown -->
@@ -61,9 +65,7 @@
 								<button class="jump-btn" id="year"></button>
 							</div>
 						</div>
-
 					</div>
-
 					<!-- Navigation buttons betwixt pages -->
 					<div class="nav-buttons">
 						<!-- Button to go to Home Page-->
@@ -72,27 +74,22 @@
 								<img id="homepage-icon" src="../icons/home-icon.png" alt="Home">
 							</button>
 						</a>
-
 						<!--Button to go to Calendar-->
 						<a href="./calendar.html">
 							<button class="nav-calendar-btn">
 								<img id="calendar-icon" src="../icons/calendar-icon.webp" alt="Calendar">
 							</button>
 						</a>
-
 						<button class="theme-btn">
 							<img id="theme-icon" src="../icons/lightmode.png" alt="Light Mode On">
 						</button>
-
 						<!--Button to go to Settings-->
 						<!-- <button class="nav-settings-btn" href="">
                 <img src="../icons/settings-icon.png" alt="Settings">
               </button> -->
-
 					</div>
 				</div>
 			</section>
-
 			<!-- Calendar Table -->
 			<table class="table-calendar" id="calendar" data-lang="en">
 				<thead id="thead-weekheadings"></thead>
@@ -100,9 +97,7 @@
 			</table>
 		</div>
 	</main>
-
 	<!-- Javascript file -->
 	<script src="./calendar.js"></script>
 </body>
-
 </html>

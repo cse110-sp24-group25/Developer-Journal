@@ -10,6 +10,9 @@ var currDate = new Date();
 var month = currDate.getMonth();
 var year = currDate.getFullYear();
 
+// Defines confetti
+const confetti = window.confetti;
+
 /**
  * Updates the global date variables to the current date.
  */
@@ -159,15 +162,15 @@ function addTask(loadTask = false) {
 	// Add it at the first row
 	task.insertAdjacentHTML("beforeend", `
         <div class="check-input-wrap">
-            <button id="task1" class="task-checkbox"></button>
+            <button id="task1" class="task-checkbox" aria-label="Task Checkbox"></button>
             <div contenteditable="true" class="task-input" placeholder="Add a task..." onkeypress="return this.innerText.length <= 180;"></div>
         </div>
         <div class="color-buttons">
-            <button id="purple" class="color-button"></button>
-            <button id="green" class="color-button"></button>
-            <button id="blue" class="color-button"></button>
-            <button id="pink" class="color-button"></button>
-            <button id="grey" class="color-button"></button>
+            <button id="purple" class="color-button" aria-label="Purle"></button>
+            <button id="green" class="color-button" aria-label="Green"></button>
+            <button id="blue" class="color-button" aria-label="Blue"></button>
+            <button id="pink" class="color-button" aria-label="Pink"></button>
+            <button id="grey" class="color-button" aria-label="Grey"></button>
         </div>
         <img class="trash-icon" src="../icons/trash-icon.svg" alt="Remove">
     `);
@@ -215,58 +218,64 @@ function addTask(loadTask = false) {
  * @param {HTMLElement} task - The task element to add functionality to.
  */
 function taskButtonsFunctionality(task) {
-	// Implement color changing functionality 
-	const colorBtns = task.querySelectorAll(".color-button");
-	colorBtns.forEach(btn => {
-		btn.addEventListener('click', function () {
-			let color;
-			switch (btn.id) {
-				case "purple":
-					color = "#C380CC";
-					break;
-				case "green":
-					color = "#91DC79";
-					break;
-				case "blue":
-					color = "#6BB1D9";
-					break;
-				case "pink":
-					color = "#EEBAE9";
-					break;
-				default:
-					color = "var(--main-color)";
-			}
-			task.style['background-color'] = color;
-			saveTasks();
-		});
-	});
+    // Implement color changing functionality 
+    const colorBtns = task.querySelectorAll(".color-button");
+    colorBtns.forEach(btn => {
+        btn.addEventListener('click', function () {
+            let color;
+            switch (btn.id) {
+                case "purple":
+                    color = "#C380CC";
+                    break;
+                case "green":
+                    color = "#91DC79";
+                    break;
+                case "blue":
+                    color = "#6BB1D9";
+                    break;
+                case "pink":
+                    color = "#EEBAE9";
+                    break;
+                default:
+                    color = "var(--main-color)";
+            }
+            task.style['background-color'] = color;
+            saveTasks();
+        });
+    });
 
-	// Trash icon delete functionality
-	const deleteIcon = task.querySelector(".trash-icon");
-	deleteIcon.addEventListener("click", () => {
-		task.remove();
-		saveTasks();
-	});
+    // Trash icon delete functionality
+    const deleteIcon = task.querySelector(".trash-icon");
+    deleteIcon.addEventListener("click", () => {
+        task.remove();
+        saveTasks();
+    });
 
-	// Checkbox move to completed tasks functionality
-	const checkbox = task.querySelector(".task-checkbox");
-	checkbox.addEventListener('click', function () {
+    // Checkbox move to completed tasks functionality
+    const checkbox = task.querySelector(".task-checkbox");
+    checkbox.addEventListener('click', function () {
 
-		// Add or remove completed from class name
-		if (task.className.includes('complete')) {
-			task.classList.remove('complete');
-			const taskContainer = document.querySelector('.task-container');
-			taskContainer.appendChild(task);
-			task.addEventListener("blur", saveTasks);
-			saveTasks();
-		}
-		else {
-			task.classList.add('complete');
-			saveCompleted(task);
-			task.remove()
-			saveTasks();
-		}
-	});
+        // Add or remove completed from class name
+        if (task.className.includes('complete')) {
+            task.classList.remove('complete');
+            const taskContainer = document.querySelector('.task-container');
+            taskContainer.appendChild(task);
+            task.addEventListener("blur", saveTasks);
+            saveTasks();
+        }
+        else {
+            task.classList.add('complete');
+            saveCompleted(task);
+            task.remove()
+            saveTasks();
+
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    });
 }
 
 /**
@@ -496,8 +505,9 @@ function loadCellDataTest(cellData, currCalendarMonth) {
 
 	// Query is in format ?date=month-day-year
 	aLink.href = `../homepage/homepage.html?date=${monthLink}-${dayLink}-${yearLink}`;
-	aLink.className = "a-link";
-	cellData.appendChild(aLink);
+  aLink.className = "a-link";
+  aLink.setAttribute("aria-label", `Link to details for ${monthLink + 1}/${dayLink}/${yearLink}`);
+  cellData.appendChild(aLink);
 }
 
 /**
